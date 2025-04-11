@@ -13,7 +13,7 @@ params.average_qual = 30
 
 params.spades_outdir = "${params.wd}/spades"
 params.cov_cutoff = 10
-params.genomics_scripts = "${params.wd}/genomics_scripts/"
+params.genomics_scripts = "${baseDir}/"
 params.filtered_dir = "${params.wd}/filtered_assemblies"
 
 // Include modules
@@ -37,11 +37,6 @@ workflow {
                             }
 
      FASTP_QC_TRIM (paired_reads_ch,params.trim_front1,params.trim_front2,params.length_required,params.average_qual)
-
-     def genomics_scripts = file(params.genomics_scripts)
-     if (!genomics_scripts.exists()) {
-        "git clone https://github.com/chrisgulvik/genomics_scripts.git ${params.genomics_scripts}".execute().waitFor()
-     }
 
      SPADES_ASSEMBLE (FASTP_QC_TRIM.out.base, 
                     FASTP_QC_TRIM.out.clean_R1, 
