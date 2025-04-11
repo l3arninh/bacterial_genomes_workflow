@@ -21,6 +21,7 @@ include { FASTP_QC_TRIM  } from './modules/FASTP_QC_TRIM.nf'
 include { SPADES_ASSEMBLE } from './modules/SPADES_ASSEMBLE.nf'
 include { FILTER_ASSEMBLY   } from './modules/FILTER_ASSEMBLY.nf'
 include { PAIRWISE_FASTANI } from './modules/PAIRWISE_FASTANI.nf'
+include { MLST_GENOTYPE } from './modules/MLST_GENOTYPE.nf'
 
 workflow {
     if ( !file(params.wd).exists() ) {
@@ -38,15 +39,15 @@ workflow {
 
      FASTP_QC_TRIM (paired_reads_ch,params.trim_front1,params.trim_front2,params.length_required,params.average_qual)
 
-     SPADES_ASSEMBLE (FASTP_QC_TRIM.out.base, 
-                    FASTP_QC_TRIM.out.clean_R1, 
-                    FASTP_QC_TRIM.out.clean_R2, 
+     SPADES_ASSEMBLE (FASTP_QC_TRIM.out.base,
+                    FASTP_QC_TRIM.out.clean_R1,
+                    FASTP_QC_TRIM.out.clean_R2,
                     FASTP_QC_TRIM.out.singletons,
                     params.cov_cutoff)
-     
+
     FILTER_ASSEMBLY (params.genomics_scripts, SPADES_ASSEMBLE.out.base,
                     SPADES_ASSEMBLE.out.outfolder)
-    
+
     filter_outputs_ch = FILTER_ASSEMBLY.out.collect()
     filtered_assemblies_ch =  filter_outputs_ch.map { file_list ->
                                                 file_list.findAll { it.name.endsWith('filtered_assembly.fna') }
@@ -54,4 +55,6 @@ workflow {
     filtered_assemblies_list_ch = filtered_assemblies_ch.collect()
 
     PAIRWISE_FASTANI (filtered_assemblies_list_ch)
+
+    MLST_GENOTYPE (filtered_assemblies_list_ch)
 }
