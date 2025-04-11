@@ -1,0 +1,3 @@
+test_data/SRR28480437_1.fastq.gz	test_data/SRR28480437_2.fastq.gz
+test_data/SRR28480438_1.fastq.gz	test_data/SRR28480438_2.fastq.gz
+test_data/SRR28480439_1.fastq.gz	test_data/SRR28480439_2.fastq.gz
